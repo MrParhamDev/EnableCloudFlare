@@ -24,11 +24,15 @@ def find_fast_server(arg):
     for i in list_server:
         space = (20 - len(i)) * ' '
 
-
         cmd = "curl -s -o /dev/null -w '%{http_code}' " + f"http://{i}"
-        response = int(subprocess.check_output(cmd, shell=True, encoding='utf-8'))
-
-        if os.system(f"ping -c1 {i} &> /dev/null") == 0 and (response >= 200 and response <= 399) :            
+        try:
+            response = int(subprocess.check_output(cmd, shell=True, encoding='utf-8'))
+        except:
+            print(f"{i}    {space}{color_red}does not seem normal domain{color_reset}")
+            print("-"*55)
+            continue
+        ping = os.system(f"ping -c1 {i} &> /dev/null")
+        if ping == 0 and (response >= 200 and response <= 399) :            
             a = subprocess.check_output(f"ping -c 3 {i} | tail -n1 | cut -d' ' -f4 | cut -d'/' -f2",shell=True,encoding="utf-8").replace("\n" , "")
             print(f"{i} {color_green}OK{color_green} {space}Speed:{color_yellow} {a}{color_reset}ms {color_green}Response: {color_reset}{response}")
 
